@@ -11,9 +11,9 @@
 #define PIXELS_PER_MONTH 100
 #define MIN_WIDTH 1000
 
-double devtime[100];
-double reviewtime[100];
-double leadtime[100];
+double devtime[1000];
+double reviewtime[1000];
+double leadtime[1000];
 int num_months = 0;
 
 void read_csv(const char *filename) {
