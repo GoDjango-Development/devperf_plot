@@ -15,10 +15,10 @@ static void plot_legend(cairo_t *cr, int width, int margin);
 static void plot_axis(cairo_t *cr, int width, int height, int margin);
 /* Plot lables and horizontal lines */
 static void plot_labels(cairo_t *cr, int width, int height, int margin,
-	int nmonths, double x_step, double y_scale);
+	int nmonths, double x_step, double y_scale, int st_month, int st_year);
 
 void draw_plot(cairo_t *cr, int width, int height, int margin, int nmonths,
-	double *dtime, double *rtime, double *ltime) {
+	double *dtime, double *rtime, double *ltime, int st_month, int st_year) {
     double max_y = 30.0;
     double y_scale = (height - 2 * margin) / max_y;
     double x_step = (nmonths > 1) ? (double) (width - 2 *
@@ -28,7 +28,8 @@ void draw_plot(cairo_t *cr, int width, int height, int margin, int nmonths,
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_paint(cr);
 	plot_axis(cr, width, height, margin);
-	plot_labels(cr, width, height, margin, nmonths, x_step, y_scale);
+	plot_labels(cr, width, height, margin, nmonths, x_step, y_scale, st_month,
+        st_year);
     plot_series(cr, margin, height, nmonths, y_scale, x_step, dtime, 1, 0, 0);
     plot_series(cr, margin, height, nmonths, y_scale, x_step, rtime, 0, 0, 1);
     plot_series(cr, margin, height, nmonths, y_scale, x_step, ltime, 0, 0.6, 0);
@@ -89,7 +90,7 @@ static void plot_axis(cairo_t *cr, int width, int height, int margin)
 }
 
 static void plot_labels(cairo_t *cr, int width, int height, int margin,
-	int nmonths, double x_step, double y_scale)
+	int nmonths, double x_step, double y_scale, int st_month, int st_year)
 {
     cairo_set_font_size(cr, 12);
 	int i = 0;
@@ -110,20 +111,19 @@ static void plot_labels(cairo_t *cr, int width, int height, int margin,
         cairo_stroke(cr);
         cairo_restore(cr);
     }
-    /* Lables X: months since EPOCH (september 2025) */
-    int month = 9, year = 2025;
+    /* Lables X: months since EPOCH */
     cairo_set_font_size(cr, 12);
 	i = 0;
     for (; i < nmonths; i++) {
         double x= margin + i * x_step;
         char label[LINE_MAX];
-        snprintf(label, sizeof label, "%d/%d", month, year);
+        snprintf(label, sizeof label, "%d/%d", st_month, st_year);
         cairo_move_to(cr,x - 20, height - margin + 20);
         cairo_show_text(cr,label);
-        month++;
-        if (month > 12) {
-			month = 1;
-			year++;
+        st_month++;
+        if (st_month > 12) {
+			st_month = 1;
+			st_year++;
 		}
     }
 }

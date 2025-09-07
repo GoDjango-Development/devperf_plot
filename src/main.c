@@ -26,7 +26,10 @@ int num_months = 0;
 int main(int argc, char **argv) {
     if (argc < 2)
         return EXIT_FAILURE;
-    if (read_csv(*(argv + 1), devtime, reviewtime, leadtime, &num_months)) {
+    int st_month = 0;
+    int st_year = 0;
+    if (read_csv(*(argv + 1), devtime, reviewtime, leadtime, &num_months,
+        &st_month, &st_year)) {
         perror(ECSV);
         return EXIT_FAILURE;
     }
@@ -34,7 +37,7 @@ int main(int argc, char **argv) {
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;
     void *data = crtsurf_plot(PLOTFILE, width, HEIGHT, MARGIN, num_months,
-        devtime, reviewtime, leadtime);
+        devtime, reviewtime, leadtime, st_month, st_year);
     if (!data) {
         perror(ESURF);
         return EXIT_FAILURE;

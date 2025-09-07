@@ -9,16 +9,29 @@
 #define DEVTIME 0
 #define REVTIME 1
 #define LEADTIME 2
+#define EPOCH_DEL "/"
 
 int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
-    int *nmonth) {
+    int *nmonth, int *month, int *year) {
     FILE *f = fopen(file, "r");
     if (!f)
 		return -1;
     char line[LINE_MAX];
     int line_num = 0;
-    while (fgets(line, sizeof(line), f)) {
-        char *tok = strtok(line, ",");
+    char *tok;
+    if (fgets(line, sizeof line, f) != NULL) {
+        char *pt = strstr(line, EPOCH_DEL);
+        if (pt != NULL) {
+            tok = strtok(line, EPOCH_DEL);
+            if (tok != NULL)
+                *month = atoi(tok);
+            tok = strtok(NULL, EPOCH_DEL);
+            if (tok != NULL)
+                *year = atoi(tok);
+        }
+    }
+    while (fgets(line, sizeof line, f)) {
+        tok = strtok(line, ",");
         int i = 0;
         while (tok) {
             double val = atof(tok);
@@ -42,7 +55,8 @@ int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
 }
 
 void *crtsurf_plot(const char *plotfile, int width, int height, int margin,
-    int nmonths, double *dtime, double *rtime, double *ltime)
+    int nmonths, double *dtime, double *rtime, double *ltime, int st_month,
+    int st_year)
 {
     unsigned char *data = malloc(width * height * 4);
     if (!data)
@@ -50,7 +64,8 @@ void *crtsurf_plot(const char *plotfile, int width, int height, int margin,
     cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
 		CAIRO_FORMAT_ARGB32, width, height, width * 4);
     cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width, height, margin, nmonths, dtime, rtime, ltime);
+    draw_plot(cr, width, height, margin, nmonths, dtime, rtime, ltime, st_month,
+        st_year);
     cairo_surface_write_to_png(surface, plotfile);
     cairo_destroy(cr);
     cairo_surface_destroy(surface);
