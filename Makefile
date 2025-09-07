@@ -6,9 +6,9 @@ CAIRO_LIBS   = $(shell pkg-config --libs cairo)
 
 #Release profile
 
-obj = release/obj/main.o release/obj/plot_io.o
+obj = release/obj/main.o release/obj/plot_io.o release/obj/plot_graph.o
 
-hdr = include/plot_io.h
+hdr = include/plot_io.h include/plot_graph.h
 
 plot_file = config/data.csv
 
@@ -27,6 +27,9 @@ release/obj/main.o: src/main.c
 release/obj/plot_io.o: src/plot_io.c include/plot_io.h
 	$(CC) src/plot_io.c -o release/obj/plot_io.o $(cflags)
 
+release/obj/plot_graph.o: src/plot_graph.c include/plot_graph.h
+	$(CC) src/plot_graph.c -o release/obj/plot_graph.o $(cflags)
+
 run: release
 ifneq ("$(wildcard $(release_bin))","")
 	$(release_bin) $(plot_file)
@@ -43,7 +46,7 @@ rebuild:
 
 # Debug profile
 
-dbg = debug/obj/main.o debug/obj/plot_io.o
+dbg = debug/obj/main.o debug/obj/plot_io.o debug/obj/plot_graph.o
 
 debug_bin = debug/plot_devperf
 CCGX = gcc -g -DDEBUG -o
@@ -59,6 +62,9 @@ debug/obj/main.o: src/main.c
 
 debug/obj/plot_io.o: src/plot_io.c include/plot_io.h
 	$(CCG) src/plot_io.c -o debug/obj/plot_io.o $(cflags)
+
+debug/obj/plot_graph.o: src/plot_graph.c include/plot_graph.h
+	$(CCG) src/plot_graph.c -o debug/obj/plot_graph.o $(cflags)
 
 run_debug: debug
 ifneq ("$(wildcard $(debug_bin))","")
