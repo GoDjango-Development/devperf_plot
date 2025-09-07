@@ -2,6 +2,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 
+#define WINTITLE "Plot DevPerf"
+
 /* SDL Window event loop */
 static void event_loop(SDL_Renderer *renderer, int winwidth, int winheight,
 	SDL_Texture *texture, int width);
@@ -12,7 +14,7 @@ int plot_crtwin(void *data, int winwidth, int winheight, int dym_width)
 		fprintf(stderr, "SDL_Initerror:%s\n", SDL_GetError());
 		return 1;
 	}
-    SDL_Window *window = SDL_CreateWindow("Plot SDL", SDL_WINDOWPOS_CENTERED,
+    SDL_Window *window = SDL_CreateWindow(WINTITLE, SDL_WINDOWPOS_CENTERED,
 	SDL_WINDOWPOS_CENTERED, winwidth, winheight, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
         SDL_RENDERER_ACCELERATED);
