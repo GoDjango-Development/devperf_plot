@@ -42,7 +42,7 @@ static void plot_series(cairo_t *cr, int margin, int height, int nmonths,
 	cairo_set_line_width(cr, 3);
 	cairo_move_to(cr, margin, height - margin - data[0] * y_scale);
 	int i = 1;
-	for(; i < nmonths; i++){
+	for (; i < nmonths; i++) {
 		double x = margin + i * x_step;
 		double y = height - margin - data[i] * y_scale;
 		cairo_line_to(cr, x, y);
@@ -93,7 +93,7 @@ static void plot_labels(cairo_t *cr, int width, int height, int margin,
 {
     cairo_set_font_size(cr, 12);
 	int i = 0;
-    for(; i <= 30; i++) {
+    for (; i <= 30; i++) {
         double y = height - margin - i * y_scale;
         char label[LINE_MAX];
         snprintf(label, sizeof label ,"%d", i);
@@ -114,14 +114,14 @@ static void plot_labels(cairo_t *cr, int width, int height, int margin,
     int month = 9, year = 2025;
     cairo_set_font_size(cr, 12);
 	i = 0;
-    for(; i < nmonths; i++) {
+    for (; i < nmonths; i++) {
         double x= margin + i * x_step;
         char label[LINE_MAX];
         snprintf(label, sizeof label, "%d/%d", month, year);
         cairo_move_to(cr,x - 20, height - margin + 20);
         cairo_show_text(cr,label);
         month++;
-        if(month > 12) {
+        if (month > 12) {
 			month = 1;
 			year++;
 		}

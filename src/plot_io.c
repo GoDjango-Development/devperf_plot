@@ -17,10 +17,10 @@ int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
 		return -1;
     char line[LINE_MAX];
     int line_num = 0;
-    while(fgets(line, sizeof(line), f)) {
+    while (fgets(line, sizeof(line), f)) {
         char *tok = strtok(line, ",");
         int i = 0;
-        while(tok) {
+        while (tok) {
             double val = atof(tok);
             if(line_num == DEVTIME)
 				*(dtime + i) = val;
@@ -31,10 +31,10 @@ int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
             tok = strtok(NULL, ",");
             i++;
         }
-        if(i > *nmonth)
+        if (i > *nmonth)
 			*nmonth = i;
         line_num++;
-        if(line_num > 2)
+        if (line_num > 2)
 			break;
     }
     fclose(f);

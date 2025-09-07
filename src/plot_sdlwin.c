@@ -8,7 +8,7 @@ static void event_loop(SDL_Renderer *renderer, int winwidth, int winheight,
 
 int plot_crtwin(void *data, int winwidth, int winheight, int dym_width)
 {
-	if(SDL_Init(SDL_INIT_VIDEO) != 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "SDL_Initerror:%s\n", SDL_GetError());
 		return 1;
 	}
