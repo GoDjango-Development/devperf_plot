@@ -51,9 +51,9 @@ void read_csv(const char *filename) {
 
 void draw_plot(cairo_t *cr, int width) {
     double max_y = 30.0;
-    double y_scale=(HEIGHT - 2 * MARGIN) / max_y;
-    double x_step = (num_months>1) ? (double)(width - 2 *
-		MARGIN)/(num_months - 1) : 10.0;
+    double y_scale = (HEIGHT - 2 * MARGIN) / max_y;
+    double x_step = (num_months>1) ? (double) (width - 2 *
+		MARGIN) / (num_months - 1) : 10.0;
     cairo_set_antialias(cr, CAIRO_ANTIALIAS_BEST);
     /* White background */
     cairo_set_source_rgb(cr, 1, 1, 1);
@@ -115,9 +115,9 @@ void draw_plot(cairo_t *cr, int width) {
         cairo_move_to(cr, MARGIN, HEIGHT - MARGIN - data[0] * y_scale);
 		int i = 1;
         for(; i < num_months; i++){
-            double x=MARGIN+i*x_step;
-            double y=HEIGHT-MARGIN-data[i]*y_scale;
-            cairo_line_to(cr,x,y);
+            double x = MARGIN + i * x_step;
+            double y = HEIGHT-MARGIN - data[i] * y_scale;
+            cairo_line_to(cr, x, y);
         }
         cairo_stroke(cr);
     }
@@ -134,7 +134,7 @@ void draw_plot(cairo_t *cr, int width) {
     cairo_set_source_rgb(cr, 0, 0, 0);
 	cairo_move_to(cr, lx + 30, ly + 5);
 	cairo_show_text(cr, "DevTime");
-    ly+=25;
+    ly += 25;
 	cairo_set_source_rgb(cr, 0, 0, 1);
 	cairo_rectangle(cr, lx, ly, 20, 5);
 	cairo_fill(cr);
@@ -159,7 +159,7 @@ int main(void){
     cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
 		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
     cairo_t *cr = cairo_create(surface);
-    draw_plot(cr,width);
+    draw_plot(cr, width);
     cairo_surface_write_to_png(surface, "plot.png");
     if(SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "SDL_Initerror:%s\n", SDL_GetError());
@@ -208,7 +208,7 @@ int main(void){
         SDL_RenderClear(renderer);
         SDL_Rect src = { offset_x, 0, WINDOW_WIDTH, HEIGHT };
         SDL_Rect dst = { 0, 0, WINDOW_WIDTH, HEIGHT };
-        SDL_RenderCopy(renderer,texture,&src,&dst);
+        SDL_RenderCopy(renderer,texture, &src, &dst);
         SDL_RenderPresent(renderer);
     }
     cairo_destroy(cr);
