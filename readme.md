@@ -1,6 +1,6 @@
 # CSV Plotter with SDL2 and Cairo
 
-This program reads a CSV file with three lines of numerical data and plots them
+This program reads a CSV file with four lines of numerical data and plots them
 as colored lines. It displays the result in an SDL2 window with horizontal
 scrolling and saves the output as a PNG file (`plot.png`).
 
@@ -57,20 +57,23 @@ gcc plot.c -o plot $(pkg-config --cflags --libs sdl2) -lSDL2_gfx $(pkg-config
 ./plot data.csv
 ```
 
-Where `data.csv` has **exactly three lines**, each representing a different
+Where `data.csv` has **exactly four lines**, each representing a different
 metric:
 
-1. **DevTime** – first line
-2. **ReviewTime** – second line
-3. **LeadTime** – third line
+1. **Plot EPOCH** first line
+2. **DevTime** – second line
+3. **ReviewTime** – third line
+4. **LeadTime** – fourth line
 
 ### CSV format
 
+* EPOCH must separated by /
 * Numbers must be separated by commas.
-* **Important:** Each line must end with a comma.
+* **Important:** Each line, except first one, must end with a comma.
 * Example:
 
 ```
+9/2025
 5,8,6,7,9,10,8,7,6,5,7,8,
 4,6,5,6,7,8,7,6,5,4,6,7,
 12,14,13,15,16,18,17,16,14,13,15,16,
@@ -94,6 +97,7 @@ months.
 Suppose your `data.csv` contains:
 
 ```
+9/2025
 10,12,8,15,
 5,6,4,7,
 20,18,15,25,
