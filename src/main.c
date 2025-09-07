@@ -41,7 +41,7 @@ void read_csv(const char *filename) {
             i++;
         }
         if(i > num_months)
-			num_months=i;
+			num_months = i;
         line_num++;
         if(line_num > 2)
 			break;
@@ -95,7 +95,7 @@ void draw_plot(cairo_t *cr, int width) {
     int month = 9, year = 2025;
     cairo_set_font_size(cr, 12);
 	i = 0;
-    for(; i < num_months; i++){
+    for(; i < num_months; i++) {
         double x= MARGIN + i * x_step;
         char label[LINE_MAX];
         snprintf(label, sizeof label, "%d/%d", month, year);
@@ -150,8 +150,10 @@ void draw_plot(cairo_t *cr, int width) {
 	cairo_show_text(cr, "LeadTime");
 }
 
-int main(void){
-    read_csv("data.csv");
+int main(int argc, char **argv) {
+    if (argc < 2)
+        return EXIT_FAILURE;
+    read_csv(*(argv + 1));
     int width = (num_months * PIXELS_PER_MONTH);
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;
