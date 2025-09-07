@@ -16,13 +16,15 @@
 #define MAX_MONTHS 1000
 #define PLOTFILE "plot.png"
 #define ECSV "Cannot open CSV"
+#define ESURF "Cannot create drawing surface"
 
 double devtime[MAX_MONTHS];
 double reviewtime[MAX_MONTHS];
 double leadtime[MAX_MONTHS];
 int num_months = 0;
 
-
+/* Create draw surface and output png plot */
+static void *crtsurf_plot(int width);
 
 int main(int argc, char **argv) {
     if (argc < 2)
@@ -34,13 +36,11 @@ int main(int argc, char **argv) {
     int width = (num_months * PIXELS_PER_MONTH);
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;
-    unsigned char *data = malloc(width * HEIGHT * 4);
-    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
-		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
-    cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
-        leadtime);
-    cairo_surface_write_to_png(surface, PLOTFILE);
+    unsigned char *data = crtsurf_plot(width);
+    if (!data) {
+        perror(ESURF);
+        return EXIT_FAILURE;
+    }
     if(SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "SDL_Initerror:%s\n", SDL_GetError());
 		return 1;
@@ -77,7 +77,7 @@ int main(int argc, char **argv) {
 			} else if(e.type == SDL_MOUSEMOTION){
                 if(dragging) {
 					offset_x += last_mouse_x - e.motion.x;
-					last_mouse_x=e.motion.x;
+					last_mouse_x = e.motion.x;
 				}
             }
         }
@@ -91,13 +91,28 @@ int main(int argc, char **argv) {
         SDL_RenderCopy(renderer,texture, &src, &dst);
         SDL_RenderPresent(renderer);
     }
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
+
     SDL_DestroyTexture(texture);
     free(data);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
     printf("Plot saved to plot.png and displayed in SDL window.\n");
-    return 0;
+    return EXIT_SUCCESS;;
+}
+
+static void *crtsurf_plot(int width)
+{
+    unsigned char *data = malloc(width * HEIGHT * 4);
+    if (!data)
+        return NULL;
+    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
+		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
+    cairo_t *cr = cairo_create(surface);
+    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
+        leadtime);
+    cairo_surface_write_to_png(surface, PLOTFILE);
+    cairo_destroy(cr);
+    cairo_surface_destroy(surface);
+    return data;
 }
