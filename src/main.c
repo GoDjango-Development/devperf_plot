@@ -17,6 +17,7 @@
 #define PLOTFILE "plot.png"
 #define ECSV "Cannot open CSV"
 #define ESURF "Cannot create drawing surface"
+#define PLOTMSG "Plot saved to " PLOTFILE " and displayed in SDL window.\n"
 
 double devtime[MAX_MONTHS];
 double reviewtime[MAX_MONTHS];
@@ -25,6 +26,8 @@ int num_months = 0;
 
 /* Create draw surface and output png plot */
 static void *crtsurf_plot(int width);
+/* SDL Window event loop */
+static void event_loop(SDL_Renderer *renderer, SDL_Texture *texture, int width);
 
 int main(int argc, char **argv) {
     if (argc < 2)
@@ -48,16 +51,46 @@ int main(int argc, char **argv) {
     SDL_Window *window = SDL_CreateWindow("Plot SDL", SDL_WINDOWPOS_CENTERED,
 	SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer =SDL_CreateRenderer(window, -1,
-		SDL_RENDERER_ACCELERATED);
+        SDL_RENDERER_ACCELERATED);
     SDL_Surface *sdl_surface = SDL_CreateRGBSurfaceFrom(data, width, HEIGHT,
 		32, width * 4, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer,sdl_surface);
     SDL_FreeSurface(sdl_surface);
+    /* Window event loop */
+    event_loop(renderer, texture, width);
+    /* ----------------- */
+    SDL_DestroyTexture(texture);
+    free(data);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    printf(PLOTMSG);
+    return EXIT_SUCCESS;;
+}
+
+static void *crtsurf_plot(int width)
+{
+    unsigned char *data = malloc(width * HEIGHT * 4);
+    if (!data)
+        return NULL;
+    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
+		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
+    cairo_t *cr = cairo_create(surface);
+    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
+        leadtime);
+    cairo_surface_write_to_png(surface, PLOTFILE);
+    cairo_destroy(cr);
+    cairo_surface_destroy(surface);
+    return data;
+}
+
+static void event_loop(SDL_Renderer *renderer, SDL_Texture *texture, int width)
+{
     int offset_x = 0;
     int quit = 0;
     int dragging = 0, last_mouse_x = 0;
     SDL_Event e;
-    while(!quit){
+    while(!quit) {
         while(SDL_PollEvent(&e)) {
             if(e.type == SDL_QUIT)
 				quit = 1;
@@ -88,31 +121,8 @@ int main(int argc, char **argv) {
         SDL_RenderClear(renderer);
         SDL_Rect src = { offset_x, 0, WINDOW_WIDTH, HEIGHT };
         SDL_Rect dst = { 0, 0, WINDOW_WIDTH, HEIGHT };
-        SDL_RenderCopy(renderer,texture, &src, &dst);
+        SDL_RenderCopy(renderer, texture, &src, &dst);
         SDL_RenderPresent(renderer);
     }
-
-    SDL_DestroyTexture(texture);
-    free(data);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    printf("Plot saved to plot.png and displayed in SDL window.\n");
-    return EXIT_SUCCESS;;
 }
 
-static void *crtsurf_plot(int width)
-{
-    unsigned char *data = malloc(width * HEIGHT * 4);
-    if (!data)
-        return NULL;
-    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
-		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
-    cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
-        leadtime);
-    cairo_surface_write_to_png(surface, PLOTFILE);
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
-    return data;
-}
