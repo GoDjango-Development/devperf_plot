@@ -91,40 +91,40 @@ static void event_loop(SDL_Renderer *renderer, SDL_Texture *texture, int width)
     int quit = 0;
     int dragging = 0, last_mouse_x = 0;
     SDL_Event e;
-    while(!quit) {
-        while(SDL_WaitEvent(&e)) {
-            if(offset_x < 0)
+    do
+        while (SDL_WaitEvent(&e)) {
+            if (offset_x < 0)
                 offset_x = 0;
-            if(offset_x > width - WINDOW_WIDTH)
+            if (offset_x > width - WINDOW_WIDTH)
                 offset_x = width-WINDOW_WIDTH;
             SDL_RenderClear(renderer);
             SDL_Rect src = { offset_x, 0, WINDOW_WIDTH, HEIGHT };
             SDL_Rect dst = { 0, 0, WINDOW_WIDTH, HEIGHT };
             SDL_RenderCopy(renderer, texture, &src, &dst);
             SDL_RenderPresent(renderer);
-            if(e.type == SDL_QUIT) {
+            if (e.type == SDL_QUIT) {
 				quit = 1;
                 break;
-            } else if(e.type == SDL_KEYDOWN) {
-                if(e.key.keysym.sym == SDLK_LEFT)
+            } else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_LEFT)
 					offset_x -= 20;
-                if(e.key.keysym.sym == SDLK_RIGHT)
+                if (e.key.keysym.sym == SDLK_RIGHT)
 					offset_x += 20;
-            } else if(e.type == SDL_MOUSEBUTTONDOWN) {
-                if(e.button.button == SDL_BUTTON_LEFT) {
+            } else if (e.type == SDL_MOUSEBUTTONDOWN) {
+                if (e.button.button == SDL_BUTTON_LEFT) {
 					dragging = 1;
 					last_mouse_x = e.button.x;
 				}
-            } else if(e.type == SDL_MOUSEBUTTONUP) {
-                if(e.button.button == SDL_BUTTON_LEFT)
+            } else if (e.type == SDL_MOUSEBUTTONUP) {
+                if (e.button.button == SDL_BUTTON_LEFT)
 					dragging = 0;
-			} else if(e.type == SDL_MOUSEMOTION) {
-                if(dragging) {
+			} else if (e.type == SDL_MOUSEMOTION) {
+                if (dragging) {
 					offset_x += last_mouse_x - e.motion.x;
 					last_mouse_x = e.motion.x;
 				}
             }
         }
-    }
+    while (!quit);
 }
 
