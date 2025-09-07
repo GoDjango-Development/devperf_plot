@@ -41,15 +41,6 @@ static void event_loop(SDL_Renderer *renderer, int winwidth, int winheight,
     SDL_Event e;
     do
         while (SDL_WaitEvent(&e)) {
-            if (offset_x < 0)
-                offset_x = 0;
-            if (offset_x > dym_width - winwidth)
-                offset_x = dym_width - winwidth;
-            SDL_RenderClear(renderer);
-            SDL_Rect src = { offset_x, 0, winwidth, winheight };
-            SDL_Rect dst = { 0, 0, winwidth, winheight };
-            SDL_RenderCopy(renderer, texture, &src, &dst);
-            SDL_RenderPresent(renderer);
             if (e.type == SDL_QUIT) {
 				quit = 1;
                 break;
@@ -72,6 +63,15 @@ static void event_loop(SDL_Renderer *renderer, int winwidth, int winheight,
 					last_mouse_x = e.motion.x;
 				}
             }
+            if (offset_x < 0)
+                offset_x = 0;
+            if (offset_x > dym_width - winwidth)
+                offset_x = dym_width - winwidth;
+            SDL_RenderClear(renderer);
+            SDL_Rect src = { offset_x, 0, winwidth, winheight };
+            SDL_Rect dst = { 0, 0, winwidth, winheight };
+            SDL_RenderCopy(renderer, texture, &src, &dst);
+            SDL_RenderPresent(renderer);
         }
     while (!quit);
 }
