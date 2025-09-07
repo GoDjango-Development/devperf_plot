@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <plot_io.h>
 
 #define HEIGHT 600
 #define WINDOW_WIDTH 1000
@@ -12,42 +13,13 @@
 #define PIXELS_PER_MONTH 100
 #define MIN_WIDTH 1000
 #define MAX_MONTHS 1000
+#define ECSV "Cannot open CSV"
 
 double devtime[MAX_MONTHS];
 double reviewtime[MAX_MONTHS];
 double leadtime[MAX_MONTHS];
 int num_months = 0;
 
-void read_csv(const char *filename) {
-    FILE *f = fopen(filename,"r");
-    if(!f) {
-		perror("Cannot open CSV");
-		exit(1);
-	}
-    char line[LINE_MAX];
-    int line_num = 0;
-    while(fgets(line, sizeof(line), f)) {
-        char *token = strtok(line, ",");
-        int i = 0;
-        while(token) {
-            double val = atof(token);
-            if(line_num == 0)
-				devtime[i] = val;
-            else if(line_num == 1)
-				reviewtime[i] = val;
-            else if(line_num == 2)
-				leadtime[i] = val;
-            token = strtok(NULL, ",");
-            i++;
-        }
-        if(i > num_months)
-			num_months = i;
-        line_num++;
-        if(line_num > 2)
-			break;
-    }
-    fclose(f);
-}
 
 void draw_plot(cairo_t *cr, int width) {
     double max_y = 30.0;
@@ -153,7 +125,10 @@ void draw_plot(cairo_t *cr, int width) {
 int main(int argc, char **argv) {
     if (argc < 2)
         return EXIT_FAILURE;
-    read_csv(*(argv + 1));
+    if (read_csv(*(argv + 1), devtime, reviewtime, leadtime, &num_months)) {
+        perror(ECSV);
+        return EXIT_FAILURE;
+    }
     int width = (num_months * PIXELS_PER_MONTH);
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;

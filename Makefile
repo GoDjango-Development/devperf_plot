@@ -1,4 +1,4 @@
-cflags = -Wall -O2 -I ./include
+cflags = -I ./include
 SDL2_CFLAGS = $(shell pkg-config --cflags sdl2)
 SDL2_LIBS   = $(shell pkg-config --libs sdl2) -lSDL2_gfx
 CAIRO_CFLAGS = $(shell pkg-config --cflags cairo)
@@ -6,9 +6,9 @@ CAIRO_LIBS   = $(shell pkg-config --libs cairo)
 
 #Release profile
 
-obj = release/obj/main.o
+obj = release/obj/main.o release/obj/plot_io.o
 
-hdr =
+hdr = include/plot_io.h
 
 plot_file = config/data.csv
 
@@ -24,6 +24,8 @@ release: $(obj) $(hdr)
 release/obj/main.o: src/main.c
 	$(CC) src/main.c -o release/obj/main.o $(cflags)
 
+release/obj/plot_io.o: src/plot_io.c include/plot_io.h
+	$(CC) src/plot_io.c -o release/obj/plot_io.o $(cflags)
 
 run: release
 ifneq ("$(wildcard $(release_bin))","")
@@ -41,7 +43,7 @@ rebuild:
 
 # Debug profile
 
-dbg = debug/obj/main.o
+dbg = debug/obj/main.o debug/obj/plot_io.o
 
 debug_bin = debug/plot_devperf
 CCGX = gcc -g -DDEBUG -o
@@ -54,6 +56,9 @@ debug: $(dbg) $(hdr)
 
 debug/obj/main.o: src/main.c
 	$(CCG) src/main.c -o debug/obj/main.o $(cflags)
+
+debug/obj/plot_io.o: src/plot_io.c include/plot_io.h
+	$(CCG) src/plot_io.c -o debug/obj/plot_io.o $(cflags)
 
 run_debug: debug
 ifneq ("$(wildcard $(debug_bin))","")
