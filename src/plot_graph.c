@@ -21,8 +21,8 @@ void draw_plot(cairo_t *cr, int width, int height, int margin, int nmonths,
 	double *dtime, double *rtime, double *ltime, int st_month, int st_year) {
     double max_y = 30.0;
     double y_scale = (height - 2 * margin) / max_y;
-    double x_step = (nmonths > 1) ? (double) (width - 2 *
-		margin) / (nmonths - 1) : 10.0;
+    double x_step = (nmonths > 1) ? (double) (width - 2 * margin) /
+        (nmonths - 1) : 10.0;
     cairo_set_antialias(cr, CAIRO_ANTIALIAS_BEST);
     /* White background */
     cairo_set_source_rgb(cr, 1, 1, 1);
