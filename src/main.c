@@ -1,4 +1,3 @@
-#include <cairo/cairo.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
 #include <stdio.h>
@@ -25,8 +24,7 @@ double reviewtime[MAX_MONTHS];
 double leadtime[MAX_MONTHS];
 int num_months = 0;
 
-/* Create draw surface and output png plot */
-static void *crtsurf_plot(int width);
+
 /* SDL Window event loop */
 static void event_loop(SDL_Renderer *renderer, SDL_Texture *texture, int width);
 
@@ -40,7 +38,8 @@ int main(int argc, char **argv) {
     int width = (num_months * PIXELS_PER_MONTH);
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;
-    unsigned char *data = crtsurf_plot(width);
+    unsigned char *data = crtsurf_plot(PLOTFILE, width, HEIGHT, MARGIN,
+        num_months, devtime, reviewtime, leadtime);
     if (!data) {
         perror(ESURF);
         return EXIT_FAILURE;
@@ -67,22 +66,6 @@ int main(int argc, char **argv) {
     SDL_Quit();
     printf(PLOTMSG);
     return EXIT_SUCCESS;;
-}
-
-static void *crtsurf_plot(int width)
-{
-    unsigned char *data = malloc(width * HEIGHT * 4);
-    if (!data)
-        return NULL;
-    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
-		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
-    cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
-        leadtime);
-    cairo_surface_write_to_png(surface, PLOTFILE);
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
-    return data;
 }
 
 static void event_loop(SDL_Renderer *renderer, SDL_Texture *texture, int width)

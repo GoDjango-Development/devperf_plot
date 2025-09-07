@@ -1,8 +1,10 @@
 #include <plot_io.h>
+#include <plot_graph.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <string.h>
+#include <cairo/cairo.h>
 
 #define DEVTIME 0
 #define REVTIME 1
@@ -37,4 +39,20 @@ int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
     }
     fclose(f);
 	return 0;
+}
+
+void *crtsurf_plot(const char *plotfile, int width, int height, int margin,
+    int nmonths, double *dtime, double *rtime, double *ltime)
+{
+    unsigned char *data = malloc(width * height * 4);
+    if (!data)
+        return NULL;
+    cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
+		CAIRO_FORMAT_ARGB32, width, height, width * 4);
+    cairo_t *cr = cairo_create(surface);
+    draw_plot(cr, width, height, margin, nmonths, dtime, rtime, ltime);
+    cairo_surface_write_to_png(surface, plotfile);
+    cairo_destroy(cr);
+    cairo_surface_destroy(surface);
+    return data;
 }
