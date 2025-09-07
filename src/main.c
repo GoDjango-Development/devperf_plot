@@ -6,6 +6,7 @@
 #include <string.h>
 #include <limits.h>
 #include <plot_io.h>
+#include <plot_graph.h>
 
 #define HEIGHT 600
 #define WINDOW_WIDTH 1000
@@ -13,6 +14,7 @@
 #define PIXELS_PER_MONTH 100
 #define MIN_WIDTH 1000
 #define MAX_MONTHS 1000
+#define PLOTFILE "plot.png"
 #define ECSV "Cannot open CSV"
 
 double devtime[MAX_MONTHS];
@@ -21,106 +23,6 @@ double leadtime[MAX_MONTHS];
 int num_months = 0;
 
 
-void draw_plot(cairo_t *cr, int width) {
-    double max_y = 30.0;
-    double y_scale = (HEIGHT - 2 * MARGIN) / max_y;
-    double x_step = (num_months>1) ? (double) (width - 2 *
-		MARGIN) / (num_months - 1) : 10.0;
-    cairo_set_antialias(cr, CAIRO_ANTIALIAS_BEST);
-    /* White background */
-    cairo_set_source_rgb(cr, 1, 1, 1);
-    cairo_paint(cr);
-
-    /* Axis */
-    cairo_set_source_rgb(cr, 0, 0, 0);
-    cairo_set_line_width(cr, 2);
-    cairo_move_to(cr, MARGIN, HEIGHT - MARGIN);
-    cairo_line_to(cr, width - MARGIN, HEIGHT - MARGIN);
-    cairo_stroke(cr);
-    cairo_move_to(cr, MARGIN,HEIGHT - MARGIN);
-    cairo_line_to(cr, MARGIN, MARGIN);
-    cairo_stroke(cr);
-
-    /* Labels and horizontal lines */
-    cairo_set_font_size(cr, 12);
-	int i = 0;
-    for(; i <= 30; i++) {
-        double y = HEIGHT-MARGIN - i * y_scale;
-        char label[LINE_MAX];
-        snprintf(label, sizeof label ,"%d", i);
-        cairo_move_to(cr, MARGIN - 30, y + 5);
-        cairo_show_text(cr, label);
-
-        /* Horizontal line */
-        cairo_save(cr);
-        cairo_rectangle(cr, MARGIN, y , width - 2 * MARGIN, 1);
-        cairo_clip(cr);
-        cairo_set_line_width(cr, 1);
-        cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-        cairo_move_to(cr, MARGIN, y);
-        cairo_line_to(cr, width - MARGIN, y);
-        cairo_stroke(cr);
-        cairo_restore(cr);
-    }
-
-    /* Lables X: months since EPOCH (september 2025) */
-    int month = 9, year = 2025;
-    cairo_set_font_size(cr, 12);
-	i = 0;
-    for(; i < num_months; i++) {
-        double x= MARGIN + i * x_step;
-        char label[LINE_MAX];
-        snprintf(label, sizeof label, "%d/%d", month, year);
-        cairo_move_to(cr,x - 20, HEIGHT - MARGIN + 20);
-        cairo_show_text(cr,label);
-        month++;
-        if(month > 12) {
-			month = 1;
-			year++;
-		}
-    }
-
-    /* Draw series */
-    void plot_series(double *data, double r, double g, double b) {
-        cairo_set_source_rgb(cr, r, g, b);
-        cairo_set_line_width(cr, 3);
-        cairo_move_to(cr, MARGIN, HEIGHT - MARGIN - data[0] * y_scale);
-		int i = 1;
-        for(; i < num_months; i++){
-            double x = MARGIN + i * x_step;
-            double y = HEIGHT-MARGIN - data[i] * y_scale;
-            cairo_line_to(cr, x, y);
-        }
-        cairo_stroke(cr);
-    }
-    plot_series(devtime, 1, 0, 0);
-    plot_series(reviewtime, 0, 0, 1);
-    plot_series(leadtime, 0, 0.6, 0);
-
-    /* Plot legend */
-    double lx = width - MARGIN - 150, ly = 20;
-    cairo_set_font_size(cr, 14);
-    cairo_set_source_rgb(cr, 1, 0, 0);
-	cairo_rectangle(cr, lx, ly, 20, 5);
-	cairo_fill(cr);
-    cairo_set_source_rgb(cr, 0, 0, 0);
-	cairo_move_to(cr, lx + 30, ly + 5);
-	cairo_show_text(cr, "DevTime");
-    ly += 25;
-	cairo_set_source_rgb(cr, 0, 0, 1);
-	cairo_rectangle(cr, lx, ly, 20, 5);
-	cairo_fill(cr);
-    cairo_set_source_rgb(cr, 0, 0, 0);
-	cairo_move_to(cr, lx + 30 , ly + 5);
-	cairo_show_text(cr,"ReviewTime");
-    ly += 25;
-	cairo_set_source_rgb(cr, 0, 0.6, 0);
-	cairo_rectangle(cr, lx, ly, 20, 5);
-	cairo_fill(cr);
-    cairo_set_source_rgb(cr, 0, 0, 0);
-	cairo_move_to(cr, lx + 30, ly + 5);
-	cairo_show_text(cr, "LeadTime");
-}
 
 int main(int argc, char **argv) {
     if (argc < 2)
@@ -136,8 +38,9 @@ int main(int argc, char **argv) {
     cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
 		CAIRO_FORMAT_ARGB32, width, HEIGHT, width * 4);
     cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width);
-    cairo_surface_write_to_png(surface, "plot.png");
+    draw_plot(cr, width, HEIGHT, MARGIN, num_months, devtime, reviewtime,
+        leadtime);
+    cairo_surface_write_to_png(surface, PLOTFILE);
     if(SDL_Init(SDL_INIT_VIDEO) != 0) {
 		fprintf(stderr, "SDL_Initerror:%s\n", SDL_GetError());
 		return 1;
