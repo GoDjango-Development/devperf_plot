@@ -4,16 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #define HEIGHT 600
 #define WINDOW_WIDTH 1000
 #define MARGIN 80
 #define PIXELS_PER_MONTH 100
 #define MIN_WIDTH 1000
+#define MAX_MONTHS 1000
 
-double devtime[1000];
-double reviewtime[1000];
-double leadtime[1000];
+double devtime[MAX_MONTHS];
+double reviewtime[MAX_MONTHS];
+double leadtime[MAX_MONTHS];
 int num_months = 0;
 
 void read_csv(const char *filename) {
@@ -22,7 +24,7 @@ void read_csv(const char *filename) {
 		perror("Cannot open CSV");
 		exit(1);
 	}
-    char line[1024];
+    char line[LINE_MAX];
     int line_num = 0;
     while(fgets(line, sizeof(line), f)) {
         char *token = strtok(line, ",");
@@ -48,10 +50,10 @@ void read_csv(const char *filename) {
 }
 
 void draw_plot(cairo_t *cr, int width) {
-    double max_y=30.0;
+    double max_y = 30.0;
     double y_scale=(HEIGHT - 2 * MARGIN) / max_y;
     double x_step = (num_months>1) ? (double)(width - 2 *
-		MARGIN)/(num_months-1) : 10.0;
+		MARGIN)/(num_months - 1) : 10.0;
     cairo_set_antialias(cr, CAIRO_ANTIALIAS_BEST);
     /* White background */
     cairo_set_source_rgb(cr, 1, 1, 1);
@@ -72,7 +74,7 @@ void draw_plot(cairo_t *cr, int width) {
 	int i = 0;
     for(; i <= 30; i++) {
         double y = HEIGHT-MARGIN - i * y_scale;
-        char label[10];
+        char label[LINE_MAX];
         snprintf(label, sizeof label ,"%d", i);
         cairo_move_to(cr, MARGIN - 30, y + 5);
         cairo_show_text(cr, label);
@@ -90,18 +92,18 @@ void draw_plot(cairo_t *cr, int width) {
     }
 
     /* Lables X: months since EPOCH (september 2025) */
-    int month= 9, year = 2025;
+    int month = 9, year = 2025;
     cairo_set_font_size(cr, 12);
 	i = 0;
     for(; i < num_months; i++){
         double x= MARGIN + i * x_step;
-        char label[30];
+        char label[LINE_MAX];
         snprintf(label, sizeof label, "%d/%d", month, year);
         cairo_move_to(cr,x - 20, HEIGHT - MARGIN + 20);
         cairo_show_text(cr,label);
         month++;
         if(month > 12) {
-			month=1;
+			month = 1;
 			year++;
 		}
     }
@@ -119,9 +121,9 @@ void draw_plot(cairo_t *cr, int width) {
         }
         cairo_stroke(cr);
     }
-    plot_series(devtime, 1 ,0, 0);
+    plot_series(devtime, 1, 0, 0);
     plot_series(reviewtime, 0, 0, 1);
-    plot_series(leadtime,0 ,0.6, 0);
+    plot_series(leadtime, 0, 0.6, 0);
 
     /* Plot legend */
     double lx = width - MARGIN - 150, ly = 20;
