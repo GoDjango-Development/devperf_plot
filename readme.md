@@ -108,7 +108,7 @@ Running:
 * Shows a window with the plotted lines for 4 months.
 * PNG file `plot.png` is generated with the same plot.
 * Scroll horizontally if necessary to see all months.
-
+* There is a CSV data example at config/ folder.
 ---
 
 ## License
