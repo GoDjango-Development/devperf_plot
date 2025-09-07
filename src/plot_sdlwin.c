@@ -14,12 +14,12 @@ int plot_crtwin(void *data, int winwidth, int winheight, int dym_width)
 	}
     SDL_Window *window = SDL_CreateWindow("Plot SDL", SDL_WINDOWPOS_CENTERED,
 	SDL_WINDOWPOS_CENTERED, winwidth, winheight, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer =SDL_CreateRenderer(window, -1,
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1,
         SDL_RENDERER_ACCELERATED);
     SDL_Surface *sdl_surface = SDL_CreateRGBSurfaceFrom(data, dym_width,
 		winheight, 32, dym_width * 4, 0x00ff0000, 0x0000ff00, 0x000000ff,
 		0xff000000);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer,sdl_surface);
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, sdl_surface);
     SDL_FreeSurface(sdl_surface);
     /* Window event loop */
     event_loop(renderer, winwidth, winheight, texture, dym_width);
