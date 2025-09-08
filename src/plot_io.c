@@ -55,8 +55,8 @@ int read_csv(const char *file, double *dtime, double *rtime, double *ltime,
 }
 
 void *crtsurf_plot(const char *plotfile, int width, int height, int margin,
-    int nmonths, double *dtime, double *rtime, double *ltime, int st_month,
-    int st_year)
+    int nmonths, double *dtime, double *rtime, double *ltime, double *mtime,
+    int st_month, int st_year)
 {
     unsigned char *data = malloc(width * height * 4);
     if (!data)
@@ -64,8 +64,8 @@ void *crtsurf_plot(const char *plotfile, int width, int height, int margin,
     cairo_surface_t *surface = cairo_image_surface_create_for_data(data,
 		CAIRO_FORMAT_ARGB32, width, height, width * 4);
     cairo_t *cr = cairo_create(surface);
-    draw_plot(cr, width, height, margin, nmonths, dtime, rtime, ltime, st_month,
-        st_year);
+    draw_plot(cr, width, height, margin, nmonths, dtime, rtime, ltime, mtime,
+        st_month, st_year);
     cairo_surface_write_to_png(surface, plotfile);
     cairo_destroy(cr);
     cairo_surface_destroy(surface);

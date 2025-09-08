@@ -21,6 +21,7 @@
 double devtime[MAX_MONTHS];
 double reviewtime[MAX_MONTHS];
 double leadtime[MAX_MONTHS];
+double meantime[MAX_MONTHS];
 int num_months = 0;
 
 int main(int argc, char **argv) {
@@ -37,7 +38,7 @@ int main(int argc, char **argv) {
     if(width < MIN_WIDTH)
 		width = MIN_WIDTH;
     void *data = crtsurf_plot(PLOTFILE, width, HEIGHT, MARGIN, num_months,
-        devtime, reviewtime, leadtime, st_month, st_year);
+        devtime, reviewtime, leadtime, meantime, st_month, st_year);
     if (!data) {
         perror(ESURF);
         return EXIT_FAILURE;
