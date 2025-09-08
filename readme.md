@@ -9,6 +9,7 @@ scrolling and saves the output as a PNG file (`plot.png`).
 ## Features
 
 - Plots **DevTime**, **ReviewTime**, and **LeadTime** from a CSV file.
+- Compute at-fly and plots **MeanTAT**, a.k.a Mean Turnarround Time.
 - Y-axis ranges from 0 to 30, shown on the left.
 - X-axis shows months starting from **September 2025**.
 - Horizontal scroll bar is visible if the data exceeds the window width.
